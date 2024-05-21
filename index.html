@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Hangman</title>
+
+  <style>
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .alert {
+      background-color: #4CAF50;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate (-50%, -50%);
+      visibility: hidden;
+      padding: 10px;
+      text-align: center;
+      border-radius: 10px;
+    }
+
+    button {
+      background-color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Hangman</h1>
+ 
+  <label> Enter a Letter <label>
+  <input type = "text" id = "guess">
+
+  <button onclick = "guess()">Guess</button>
+
+  <p id = "board"></p>
+
+  <div class = "alert" id = "alert">
+    <p id = "alert-text"></p>
+    <button onclick = "hide_alert()">Close</button>
+  </div>
+  
+  <script>
+    var word = generate_word ();
+    var board = new Array (word.length).fill ("_");
+    var previous_guesses = [];
+    var lives = 5;
+    show_board ();
+
+    function generate_word () {
+      var wordlist = ["car", "road", "house", "crosswalk", "sea", "ocean"];
+      var random = Math.floor (Math.random () * wordlist.length);
+      var word = wordlist[random];
+      return word;
+    }
+
+    function show_board () {
+      var boardtext = document.getElementById ("board");
+      boardtext.innerHTML = "";
+      for (var i = 0; i < board.length; i++) {
+        var current = board[i];
+        boardtext.innerHTML += current + " ";
+      }
+    }
+
+    function guess () {
+      var letter = document.getElementById ("guess").value; 
+
+      if (is_lowercase(letter) == false) {
+        show_alert ("Please enter lowercase letter");
+      } else if (is_old_guess (letter) == true) {
+        show_alert ("Please enter new letter");
+      } else if (is_in_word(letter) == true) {
+        previous_guesses.push (letter);
+        update_board(letter);
+        show_board ();
+      } else {
+        previous_guesses.push (letter);
+        show_alert ("letter not found");
+        lives -= 1;
+      }
+
+      if (check_win () == true) {
+        show_alert ("You Win!");
+      } else if (lives == 0) {
+        show_alert ("You Lose!");
+      }
+    }
+
+    function show_alert (message) {
+      var alert = document.getElementById ("alert");
+      var alert_text = document.getElementById ("alert-text");
+
+      alert.style.visibility = "visible";
+      alert_text.innerHTML = message;
+    }
+
+    function hide_alert () {
+      var alert = document.getElementById ("alert");
+      alert.style.visibility = "hidden";
+    }
+
+    function is_lowercase (letter) {
+      var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+      for (var i = 0; i < alphabet.length; i++) {
+        var current = alphabet[i];
+        if (current == letter) {
+          return true;
+        } 
+      }
+      return false;
+    }
+
+    function is_old_guess (letter) {
+      for (var i = 0; i < previous_guesses.length; i++) {
+        var current = previous_guesses[i];
+        if (current == letter) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function is_in_word (letter) {
+      for (var i = 0; i < word.length; i++) {
+        var current = word[i];
+        if (current == letter) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function update_board (letter) {
+      for (var i = 0; i < board.length; i++) {
+        var current = word[i];
+        if (current == letter) {
+          board[i] = letter;
+        }
+      }
+    }
+
+    function check_win () {
+      var count = 0;
+
+      for (var i = 0; i < board.length; i++) {
+        var current = board[i];
+        if (current == "_") {
+          count += 1;
+        }
+      }
+
+      if (count == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  </script>
+
+</body>
+
+</html>
